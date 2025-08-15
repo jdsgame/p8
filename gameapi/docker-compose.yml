@@ -1,0 +1,27 @@
+services:
+  gameapi:
+    image: registry.cn-chengdu.aliyuncs.com/havario/gameapi
+    container_name: gameapi
+    restart: unless-stopped
+    ports:
+      - 80:80
+    environment:
+      DEV_MYSQL_HOST: 192.168.250.250
+      DEV_MYSQL_USER: root
+      DEV_MYSQL_PASSWORD: 12345678
+      DEV_MYSQL_DATABASE: example_api
+      DEV_TIMEZONE: Asia/Shanghai
+      DEV_REDIS_HOST: 192.168.250.250
+      DEV_REDIS_PORT: 6379
+      DEV_REDIS_DATABASE: example_api
+      # DEV_REDIS_PASSWORD: 12345678
+      # PRO_MYSQL_HOST: 192.168.250.250
+      # PRO_MYSQL_USER: root
+      # PRO_MYSQL_PASSWORD: 12345678
+      # PRO_MYSQL_DATABASE: example_api
+      # PRO_TIMEZONE: Asia/Shanghai
+      # PRO_REDIS_HOST: 192.168.250.250
+      # PRO_REDIS_PORT: 6379
+      # PRO_REDIS_DATABASE: example_api
+      # PRO_REDIS_PASSWORD: 12345678
+    network_mode: bridge
