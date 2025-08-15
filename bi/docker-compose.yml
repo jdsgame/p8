@@ -1,0 +1,26 @@
+services:
+  bi:
+    image: registry.cn-chengdu.aliyuncs.com/havario/bi
+    container_name: bi
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    environment:
+      DB_USER: root
+      DB_PASSWORD: 12345678
+      DB_HOST: 192.168.250.250
+      DB_PORT: 3306
+      DB_DATABASE: example_log
+      KINGNET_URL: https://example.com/dana
+      KINGNET_TOPIC: dana_example
+      KINGNET_TOKEN: 9f1c0d61a6e34d9a826e764edb3d2850
+    volumes:
+      - ./logs:/bi/logs
+      - ./migrations:/bi/migrations
+    network_mode: bridge
+    #healthcheck:
+    #  test: ["CMD-SHELL", "curl", "-f", "http://127.0.0.1:8000/health"]
+    #  interval: 60s     # 健康检查时间间隔
+    #  timeout: 10s      # 指定健康检查命令的最大执行时间
+    #  retries: 3        # 最大重试次数
+    #  start_period: 15s # 容器启动后健康检查首次运行前的宽限时间
