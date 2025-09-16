@@ -2,8 +2,8 @@
 #
 # Description: distributes ssh keys across multiple hosts.
 #
-# Copyright (C) 2025 zzwsec <zzwsec@163.com>
-# Copyright (C) 2025 honeok <honeok@duck.com>
+# Copyright (c) 2025 zzwsec <zzwsec@163.com>
+# Copyright (c) 2025 honeok <i@honeok.com>
 #
 # SPDX-License-Identifier: MIT
 
