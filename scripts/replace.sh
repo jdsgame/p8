@@ -93,25 +93,31 @@ check_pre() {
 
 # 停止守护进程
 stop_daemon() {
-    if pgrep -f processcontrol-allserver.sh >/dev/null 2>&1; then
-        for ((i=1; i<=3; i++)); do
-            if pkill -9 -f processcontrol-allserver.sh >/dev/null 2>&1; then
-                _suc_msg "$(_green "Daemon kill completed!")"
-                break
-            fi
-            [ "$i" -eq 3 ] && die "Daemon kill fail."
-        done
-    else
+    if ! pgrep -f "processcontrol-allserver.sh" >/dev/null 2>&1; then
         _info_msg "$(_yellow "Daemon not found, skip.")"
         return
     fi
+
+    pkill -9 -f "processcontrol-allserver.sh" >/dev/null 2>&1
+
+    # 给进程退出足够的时间
+    for ((i=1; i<=3; i++)); do
+        if ! pgrep -f "processcontrol-allserver.sh" >/dev/null 2>&1; then
+            _suc_msg "$(_green "Daemon kill completed!")"
+            return 0
+        fi
+        sleep 1
+    done
+
+    # deadline
+    die "Daemon kill fail."
 }
 
 # 替换执行档
 replace() {
     local SERVER_NUM="$1" # 区服id
     local SLEEP_TIME="$2"
-    local TARGET_PATH
+    local TARGET_PATH PID
     TARGET_PATH="/data/server$SERVER_NUM/game/$APP_NAME"
 
     if ! cd "/data/server$SERVER_NUM/game" >/dev/null 2>&1; then
@@ -138,8 +144,17 @@ replace() {
 
     _suc_msg "$(_cyan "server$SERVER_NUM") $(_green "completed!")"
 
+    # 等待程序完全启动再过滤pid
+    for ((i=1; i<=3; i++)); do
+        PID="$(pgrep -f "/data/server$SERVER_NUM/game/$APP_NAME" 2>/dev/null)"
+        if [[ -n "$PID" && "$PID" =~ ^[0-9]+$ ]]; then
+            break
+        fi
+        [ "$i" -eq 3 ] && die "Failed to find process id."
+        sleep 0.5
+    done
     echo
-    ps -p "$(pgrep -f "/data/server$SERVER_NUM/game/$APP_NAME" 2>/dev/null)" -o user,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,command
+    ps -p "$PID" -o user,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,command
 }
 
 _end_msg() {
