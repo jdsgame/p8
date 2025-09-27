@@ -33,7 +33,7 @@ APP_NAME="p8_app_server"
 REPLACE_CORE="/data/update/$APP_NAME" # 新执行程序
 
 clear() {
-    [ -t 1 ] && tput clear 2>/dev/null || echo -e "\033[2J\033[H" || clear
+    [ -t 1 ] && tput clear 2>/dev/null || echo -e "\033[2J\033[H" || command clear
 }
 
 die() {
