@@ -1,11 +1,10 @@
-# Description: This dockerfile is used to build the basic operating environment of bi.
-#
-# Copyright (c) 2025 The p8 Ops Team
-# Copyright (c) 2025 honeok <i@honeok.com>
-#
+# syntax=docker/dockerfile:1
 # SPDX-License-Identifier: MIT
+#
+# Description: This dockerfile is used to build the basic operating environment of bi.
+# Copyright (c) 2025-2026 The JdsGame Authors. All rights reserved.
 
-FROM m.daocloud.io/docker.io/library/python:3.9.20-alpine3.20
+FROM python:3.9.20-alpine@sha256:693ebbf7675c189850df99918ed3002ead3ac99753bc56b16fd7ee636251a958
 LABEL maintainer="honeok <i@honeok.com>"
 COPY requirements.txt .
 RUN set -ex \
