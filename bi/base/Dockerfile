@@ -4,7 +4,7 @@
 # Description: This dockerfile is used to build the basic operating environment of bi.
 # Copyright (c) 2025-2026 The JdsGame Authors. All rights reserved.
 
-FROM python:3.9.20-alpine@sha256:693ebbf7675c189850df99918ed3002ead3ac99753bc56b16fd7ee636251a958
+FROM python:3.9.25-alpine@sha256:c99b6eb43b3ac4d750db3d6e8b22268d5ea9a99deead7218ce3deda7f2ca029c
 LABEL maintainer="honeok <i@honeok.com>"
 COPY requirements.txt .
 RUN set -ex \
