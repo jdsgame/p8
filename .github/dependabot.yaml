@@ -19,6 +19,7 @@ updates:
 
   - package-ecosystem: "docker"
     directories:
+      - "/bi/base"
       - "/bserver"
       - "/ipinfo"
     schedule:
@@ -30,6 +31,10 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    ignore:
+      - dependency-name: "python"
+        versions:
+          - ">= 3.10"
     groups:
       docker:
         patterns:
