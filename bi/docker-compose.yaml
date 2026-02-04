@@ -1,6 +1,7 @@
+---
 services:
   bi:
-    image: registry.cn-chengdu.aliyuncs.com/havario/bi
+    image: registry.cn-chengdu.aliyuncs.com/jdsgame/bi
     container_name: bi
     restart: unless-stopped
     ports:
@@ -15,8 +16,8 @@ services:
       KINGNET_TOPIC: dana_example
       KINGNET_TOKEN: 9f1c0d61a6e34d9a826e764edb3d2850
     volumes:
-      - ./logs:/bi/logs
-      - ./migrations:/bi/migrations
+      - ./logs:/app/logs
+      - ./migrations:/app/migrations
     network_mode: bridge
     #healthcheck:
     #  test: ["CMD-SHELL", "curl", "-f", "http://127.0.0.1:8000/health"]
