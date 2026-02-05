@@ -1,0 +1,15 @@
+.git
+.idea/
+.vscode/
+.gitignore
+
+docker-compose.yml
+docker-compose.yaml
+
+Dockerfile
+
+game_list.txt
+login_list.txt
+init.txt
+
+/out/
