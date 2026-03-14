@@ -26,7 +26,7 @@ class RedisMerger:
             "database": "api",
             "dest_id": 1,  # 目标区服id
             "merge_ids": [2],  # 被合并区服id
-            "test": True,  # True: 测试模式，不实际执行
+            "test": False,  # True: 测试模式
             "del_merge": False,  # True: 删除已合并的键
             "max_title": 35,  # 配置最大的身份等级
         }
