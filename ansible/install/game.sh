@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=all
 
 script_dir=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
 game_port_start=3340
@@ -24,12 +25,12 @@ error_exit() {
 get_ip() {
     local server_num=$1
     local current_ip
-    while read -r line;do
-      current_ip=$(awk '{print $1}' <<< "$line")
-      if awk -F '[][]' '{print $2}' <<<"$line" | tr ',' ' ' | grep -q -w "$server_num" ;then
-        echo "$current_ip"
-        return 0
-      fi
+    while read -r line; do
+        current_ip=$(awk '{print $1}' <<< "$line")
+        if awk -F '[][]' '{print $2}' <<< "$line" | tr ',' ' ' | grep -q -w "$server_num"; then
+            echo "$current_ip"
+            return 0
+        fi
     done < "$gameListFile"
     error_exit "输入的服务编号无效" 8
 }
@@ -45,22 +46,22 @@ get_group_id() {
 
 #获取服务编号的偏移量
 get_index() {
-  local line
-  IFS=' ' read -ra line <<< "$(awk -v current_ip="$current_ip" '$1==current_ip {print $2; exit}' "$gameListFile" | tr -d '[]' | tr ',' ' ')"
-  for i in "${!line[@]}";do
-    if [ "$server_num" -eq "${line[$i]}" ];then
-      echo "$i"
-      return 0
-    fi
-  done
-  error_exit "服务编号无效" 8
+    local line
+    IFS=' ' read -ra line <<< "$(awk -v current_ip="$current_ip" '$1==current_ip {print $2; exit}' "$gameListFile" | tr -d '[]' | tr ',' ' ')"
+    for i in "${!line[@]}"; do
+        if [ "$server_num" -eq "${line[$i]}" ]; then
+            echo "$i"
+            return 0
+        fi
+    done
+    error_exit "服务编号无效" 8
 }
 
 check_env() {
-  [[ ! -f "${gameVars}/main.yml.tmp" ]] && error_exit "模板文件不存在" 8
-  [[ ! -f "$gameListFile" ]] && error_exit "$gameListFile 不存在" 2
-  [[ ! -f "$playbookFile" ]] && error_exit "$playbookFile 不存在" 3
-  sed -i '/^$/d' "$gameListFile" || error_exit "清理 game_list.txt 空行失败" 5
+    [[ ! -f "${gameVars}/main.yml.tmp" ]] && error_exit "模板文件不存在" 8
+    [[ ! -f "$gameListFile" ]] && error_exit "$gameListFile 不存在" 2
+    [[ ! -f "$playbookFile" ]] && error_exit "$playbookFile 不存在" 3
+    sed -i '/^$/d' "$gameListFile" || error_exit "清理 game_list.txt 空行失败" 5
 }
 
 check_env
@@ -80,7 +81,7 @@ group_id=$(get_group_id)
 index=$(get_index)
 game_port=$((game_port_start + index * 1000))
 
-pre_server_num=$((server_num-1))
+pre_server_num=$((server_num - 1))
 pre_ip=$(get_ip "$pre_server_num")
 
 read -r -p "当前配置：IP=$current_ip | 端口=$game_port | 编号=$server_num | 是否启动：$flag |输入任意值继续任务"

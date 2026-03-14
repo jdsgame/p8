@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=all
 # time: 2025/3/11
 
 set -o nounset
@@ -34,13 +34,12 @@ _show_spinner() {
     local pid="$2"
     local i=0
     local len=${#spinstr}
-    while kill -0 "$pid" 2>/dev/null; do
+    while kill -0 "$pid" 2> /dev/null; do
         printf "\r  ${yellow}%s [%s]${white}" "$msg" "${spinstr:i++%len:1}"
         sleep 0.1
     done
     printf "\r\033[K"
 }
-
 
 print_info_and_execute_playbook() {
     local option="$1"
@@ -86,13 +85,13 @@ update_option() {
     local flag="$2"
 
     [[ ! -f "$playbook_path" ]] && err_exit "playbook 文件 $playbook_path 不存在" 1
-    local node_name=$(awk -F '/' '{print $2}' <<<$playbook_path)
+    local node_name=$(awk -F '/' '{print $2}' <<< "$playbook_path")
     local log_file="./runlog/${flag}_${node_name}.log"
     printf "当前时间: %s\n" "$(date +%F\ %T)" >> "$log_file"
     ansible-playbook "$playbook_path" -t "$flag" >> "$log_file" 2>&1 &
     local task_pid=$!
 
-    if ! kill -0 "$task_pid" 2>/dev/null; then
+    if ! kill -0 "$task_pid" 2> /dev/null; then
         err_exit "无法启动 Ansible" 1
     fi
 
@@ -102,8 +101,8 @@ update_option() {
     local task_status=$?
 
     # 停止并清理动画
-    kill "$spinner_pid" 2>/dev/null
-    wait "$spinner_pid" 2>/dev/null || true
+    kill "$spinner_pid" 2> /dev/null
+    wait "$spinner_pid" 2> /dev/null || true
     printf "\r\033[K" # 清理动画行
 
     if [ "$task_status" -ne 0 ]; then
@@ -116,21 +115,21 @@ update_option() {
 
 [[ ! -d ./playbook/ ]] && err_exit "错误：目录 ./playbook/ 不存在" 1
 [[ ! -f ./hosts ]] && err_exit "错误：文件 ./hosts 不存在" 1
-command -v ansible &>/dev/null || err_exit "错误：ansible 未安装" 1
+command -v ansible &> /dev/null || err_exit "错误：ansible 未安装" 1
 [[ ! -d ./runlog/ ]] && mkdir -p ./runlog
 
-if [ $# -eq 0 ];then
+if [ $# -eq 0 ]; then
     err_exit "参数数量错误" 2
 fi
 
 case $1 in
-    start)
-        print_info_and_execute_playbook "start"
-        ;;
-    stop)
-        print_info_and_execute_playbook "stop"
-        ;;
-    *)
-        err_exit "参数类型错误" 2
-        ;;
+start)
+    print_info_and_execute_playbook "start"
+    ;;
+stop)
+    print_info_and_execute_playbook "stop"
+    ;;
+*)
+    err_exit "参数类型错误" 2
+    ;;
 esac

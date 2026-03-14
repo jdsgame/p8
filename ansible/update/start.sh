@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=all
 # 时间: 2025/3/27
 err_exit() {
     echo "$1" >&2
@@ -58,12 +58,11 @@ update_increment() {
     update_option "log" "playbook/log/log-entry.yaml" "increment"
 }
 
-
 # 检查 ./file/ 目录是否存在
 [[ ! -d ./file/ ]] && err_exit "错误：目录 ./file/ 不存在" 1
 
 # 检查 ansible 是否安装
-command -v ansible &>/dev/null || err_exit "错误：ansible 未安装" 1
+command -v ansible &> /dev/null || err_exit "错误：ansible 未安装" 1
 
 # 统计文件数量
 group_stat=$(find ./file/ -name "groups.lua" -type f | wc -l)
@@ -79,7 +78,7 @@ elif [[ "$group_stat" -eq 0 && "$increment_stat" -eq 1 && "$all_stat" -eq 0 ]]; 
 elif [[ "$group_stat" -eq 0 && "$increment_stat" -eq 0 && "$all_stat" -eq 1 ]]; then
     tar tf ./file/alldo.tar.gz | sed -n '1p' | grep -q "app/" || err_exit "alldo.tar.gz 未包含 app 目录" 2
     print_info_and_execute_playbook "all"
-elif [[ "$group_stat" -eq 1 && "$increment_stat" -eq 1  && "$all_stat" -eq 1 ]]; then
+elif [[ "$group_stat" -eq 1 && "$increment_stat" -eq 1 && "$all_stat" -eq 1 ]]; then
     err_exit "groups.lua 和 increment.tar.gz 和 alldo.tar.gz 同时存在，请删除或移动其中一个" 2
 else
     err_exit "groups.lua 或 increment.tar.gz 或 alldo.tar.gz 不存在，请检查 file 目录" 2
