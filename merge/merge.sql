@@ -72,6 +72,7 @@ truncate table t_rank_guild;
 truncate table t_rank_season;
 -- 队伍
 truncate table t_team;
+truncate table t_team_player;
 
 update t_player set `rank`='{}', `grocery`=json_insert(`grocery`, '$."args"', json_object(), '$."args"."4"', 1);
 set @ret3=ROW_COUNT();
@@ -216,68 +217,68 @@ set @ret12=ROW_COUNT();
 
 -- 数据合并
 -- 角色
-SET @sql = concat('insert into t_player(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_player'), 
+SET @sql = concat('insert into t_player(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_player'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_player'), ' from ', @db_name, '.t_player');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- 角色名
-SET @sql = concat('insert into t_name(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_name'), 
+SET @sql = concat('insert into t_name(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_name'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_name'), ' from ', @db_name, '.t_name');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- 活动
-SET @sql = concat('insert into t_activity(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_activity'), 
+SET @sql = concat('insert into t_activity(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_activity'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_activity'), ' from ', @db_name, '.t_activity');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- 采集
-SET @sql = concat('insert into t_cave(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_cave'), 
+SET @sql = concat('insert into t_cave(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_cave'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_cave'), ' from ', @db_name, '.t_cave');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- 跨服boss
-SET @sql = concat('insert into t_crossboss(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_crossboss'), 
+SET @sql = concat('insert into t_crossboss(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_crossboss'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_crossboss'), ' from ', @db_name, '.t_crossboss');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- 竞技场
-SET @sql = concat('insert into t_pvp(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_pvp'), 
+SET @sql = concat('insert into t_pvp(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_pvp'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_pvp'), ' from ', @db_name, '.t_pvp');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
-SET @sql = concat('insert into t_pvp_ladder(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_pvp_ladder'), 
+SET @sql = concat('insert into t_pvp_ladder(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_pvp_ladder'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_pvp_ladder'), ' from ', @db_name, '.t_pvp_ladder');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
-SET @sql = concat('insert into t_gpvp(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_gpvp'), 
+SET @sql = concat('insert into t_gpvp(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_gpvp'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_gpvp'), ' from ', @db_name, '.t_gpvp');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- 个人邮件
-SET @sql = concat('insert into t_personmail(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_personmail'), 
+SET @sql = concat('insert into t_personmail(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_personmail'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_personmail'), ' from ', @db_name, '.t_personmail');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- 公会
-SET @sql = concat('insert into t_guild(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_guild'), 
+SET @sql = concat('insert into t_guild(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_guild'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_guild'), ' from ', @db_name, '.t_guild');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
@@ -285,7 +286,7 @@ DEALLOCATE PREPARE stmt;
 
 
 -- 加公会cd
-SET @sql = concat('insert into t_member(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_member'), 
+SET @sql = concat('insert into t_member(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_member'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_member'), ' from ', @db_name, '.t_member');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
