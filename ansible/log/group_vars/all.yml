@@ -1,0 +1,2 @@
+base_path: /data
+log_retention_args: "-mtime +7"

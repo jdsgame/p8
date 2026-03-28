@@ -1,0 +1,57 @@
+# 根据停服顺序删除
+# login -> gate -> game -> cross -> gm -> global -> log -> zk -> api
+
+---
+- hosts: login
+  remote_user: root
+  gather_facts: False
+  roles: [login]
+  tags: [login]
+
+- hosts: gate
+  remote_user: root
+  gather_facts: False
+  roles: [gate]
+  tags: [gate]
+
+- hosts: game
+  remote_user: root
+  gather_facts: False
+  roles: [game]
+  tags: [game]
+
+- hosts: cross
+  remote_user: root
+  gather_facts: False
+  roles: [cross]
+  tags: [cross]
+
+- hosts: gm
+  remote_user: root
+  gather_facts: False
+  roles: [gm]
+  tags: [gm]
+
+- hosts: global
+  remote_user: root
+  gather_facts: False
+  roles: [global]
+  tags: [global]
+
+- hosts: log
+  remote_user: root
+  gather_facts: False
+  roles: [log]
+  tags: [log]
+
+- hosts: zk
+  remote_user: root
+  gather_facts: False
+  roles: [zk]
+  tags: [zk]
+
+- hosts: api
+  remote_user: root
+  gather_facts: False
+  roles: [api]
+  tags: [api]

@@ -1,0 +1,8 @@
+---
+- name: "Execute logs clean task"
+  ansible.builtin.shell:
+    chdir: "{{ item.invocation.module_args.path }}"
+    cmd: find . -maxdepth 1 -ignore_readdir_race -type f -name "*.log" {{ log_retention_args }} -print -delete
+  loop: "{{ log_dir_stat.results | default([]) }}"
+  register: clean_result
+  changed_when: (clean_result.stdout_lines | default([])) | length > 0

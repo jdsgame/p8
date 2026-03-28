@@ -1,0 +1,23 @@
+---
+- name: "Check logsrv directory"
+  ansible.builtin.find:
+    depth: 1
+    file_type: directory
+    paths: "{{ base_path }}"
+    patterns: "^logserver[0-9]+$"
+    use_regex: true
+  register: logsrv_dir
+  ignore_errors: true
+
+- name: "Check logsrv log directory"
+  ansible.builtin.stat:
+    path: "{{ item.path }}/log"
+  loop: "{{ logsrv_dir.files | default([]) }}"
+  register: log_dir_stat
+  when: logsrv_dir.matched | default(0) > 0
+
+- ansible.builtin.include_role:
+    name: clean
+  when:
+    - log_dir_stat.results is defined
+    - log_dir_stat.results | length > 0
