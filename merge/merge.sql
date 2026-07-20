@@ -54,6 +54,7 @@ DEALLOCATE PREPARE stmt;
 
 -- A库
 delete from t_activity where id in (select * from temp1);
+delete from t_arena where id in (select * from temp1);
 delete from t_cave where id in (select * from temp1);
 delete from t_crossboss where id in (select * from temp1);
 delete from t_gpvp where id in (select * from temp1);
@@ -64,6 +65,7 @@ delete from t_personmail where expire_time < unix_timestamp(now());
 delete from t_player where id in (select * from temp1);
 delete from t_pvp where id in (select * from temp1);
 delete from t_pvp_ladder where id in (select * from temp1);
+delete from t_rdw where id in (select * from temp1);
 delete from t_ticket where id in (select * from temp1);
 
 -- 排行
@@ -73,14 +75,21 @@ truncate table t_rank_season;
 -- 队伍
 truncate table t_team;
 truncate table t_team_player;
+truncate table t_snapshot_player;
+truncate table t_transport;
 
-update t_player set `rank`='{}', `grocery`=json_insert(`grocery`, '$."args"', json_object(), '$."args"."4"', 1);
+update t_player set `rank`='{}', `grocery`=json_insert(`grocery`, '$."args"', json_object(), '$."args"."4"', 1), `transport`='{}';
 set @ret3=ROW_COUNT();
-update t_guild set `rank_seasons`='{}';
+update t_guild set `rank_seasons`='{}', `domination`='{}';
 update t_pvp_ladder set `rank`=0, `reports`='{}';
 
 -- B库
 SET @sql = CONCAT('delete from ', @db_name, '.t_activity where id in (select * from temp2)');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = CONCAT('delete from ', @db_name, '.t_arena where id in (select * from temp2)');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
@@ -131,6 +140,11 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 SET @sql = CONCAT('delete from ', @db_name, '.t_pvp_ladder where id in (select * from temp2)');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = CONCAT('delete from ', @db_name, '.t_rdw where id in (select * from temp2)');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
@@ -237,6 +251,12 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
+SET @sql = concat('insert into t_arena(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_arena'),
+') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_arena'), ' from ', @db_name, '.t_arena');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
 -- 采集
 SET @sql = concat('insert into t_cave(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_cave'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_cave'), ' from ', @db_name, '.t_cave');
@@ -266,6 +286,12 @@ DEALLOCATE PREPARE stmt;
 
 SET @sql = concat('insert into t_gpvp(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_gpvp'),
 ') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_gpvp'), ' from ', @db_name, '.t_gpvp');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = concat('insert into t_rdw(', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_rdw'),
+') select ', (select group_concat('`', column_name, '`' separator ', ') from information_schema.columns where table_schema=@db_name and table_name='t_rdw'), ' from ', @db_name, '.t_rdw');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
