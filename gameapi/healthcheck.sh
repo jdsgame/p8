@@ -1,13 +1,11 @@
 #!/usr/bin/env sh
-#
-# Copyright (c) 2025 honeok <i@honeok.com>
-#
 # SPDX-License-Identifier: MIT
+# Copyright (c) 2025-2026 The JdsGame Authors. All rights reserved.
 
 count=0
 
 until nc -z -w 5 127.0.0.1 80; do
-    count=$(( count + 1 ))
+    count=$((count + 1))
 
     echo "Health check failed. Retrying ($count/2)"
     if [ $count -ge 2 ]; then

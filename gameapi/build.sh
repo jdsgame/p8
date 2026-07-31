@@ -1,12 +1,8 @@
 #!/usr/bin/env sh
-#
-# Copyright (c) 2025 honeok <i@honeok.com>
-#
 # SPDX-License-Identifier: MIT
+# Copyright (c) 2025-2026 The JdsGame Authors. All rights reserved.
 
-set \
-    -o errexit \
-    -o nounset
+set -eu
 
 WORK_DIR="/gameapi"
 RUN_DIR="$WORK_DIR/run"
@@ -36,4 +32,4 @@ mkdir -p \
     "$RUN_DIR/temp/proxy" \
     "$RUN_DIR/temp/fastcgi" \
     "$RUN_DIR/temp/uwsgi" \
-    "$RUN_DIR/temp/scgi" 1>/dev/null
+    "$RUN_DIR/temp/scgi" 1> /dev/null

@@ -1,12 +1,8 @@
 #!/usr/bin/env sh
-#
-# Copyright (c) 2025 honeok <i@honeok.com>
-#
 # SPDX-License-Identifier: MIT
+# Copyright (c) 2025-2026 The JdsGame Authors. All rights reserved.
 
-set \
-    -o errexit \
-    -o nounset
+set -eu
 
 WORK_DIR="/gameapi"
 RUN_DIR="$WORK_DIR/run"
@@ -43,10 +39,10 @@ if [ ! -d "$RUN_DIR/logs" ] || [ ! -d "$RUN_DIR/temp" ]; then
         "$RUN_DIR/temp/proxy" \
         "$RUN_DIR/temp/fastcgi" \
         "$RUN_DIR/temp/uwsgi" \
-        "$RUN_DIR/temp/scgi" 1>/dev/null
+        "$RUN_DIR/temp/scgi" 1> /dev/null
 fi
 
-chown -R nginx:nginx "$WORK_DIR" 1>/dev/null
+chown -R nginx:nginx "$WORK_DIR" 1> /dev/null
 
 # 数据库迁移所需
 cp -f "$WORK_DIR/src/config/migrations.lua" "$WORK_DIR/run/migrations.lua"
@@ -56,7 +52,7 @@ cp -f "$WORK_DIR/src/config/models.lua" "$WORK_DIR/run/models.lua"
 cp -f "$WORK_DIR/src/config/mime.types" "$WORK_DIR/run/mime.types"
 cp -f "$WORK_DIR/templates/nginx.conf" "$WORK_DIR/run/nginx.conf"
 
-if ! command -v lapis >/dev/null 2>&1; then
+if ! command -v lapis > /dev/null 2>&1; then
     echo "ERROR: lapis is not installed"
     exit 1
 fi
@@ -64,7 +60,7 @@ fi
 [ ! -s "$RUN_DIR/config.lua" ] && envsubst < "$WORK_DIR/templates/config.template.lua" > "$RUN_DIR/config.lua"
 
 cd "$RUN_DIR" || { echo "ERROR: Failed to change directory!" && exit 1; }
-if lapis migrate 2>/dev/null; then
+if lapis migrate 2> /dev/null; then
     echo "Migration completed successfully!"
 else
     echo "Migration failed!"
