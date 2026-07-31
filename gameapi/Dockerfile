@@ -5,14 +5,11 @@
 # Copyright (c) 2025-2026 The JdsGame Authors. All rights reserved.
 
 FROM registry.cn-chengdu.aliyuncs.com/havario/api-base:v0.0.6-alpine@sha256:df86009126dea7ec8bec91e2fde6cb1c7ff61ed2860f2d1537e9a8205e9efe24
-LABEL maintainer="honeok <i@honeok.com>"
 WORKDIR /gameapi
 COPY . .
 RUN set -ex \
     && sed -i 's/dl-cdn.alpinelinux.org/mirrors.nju.edu.cn/g' /etc/apk/repositories \
-    && apk update && apk upgrade \
-    && apk add --no-cache \
-        gettext-envsubst \
+    && apk add --no-cache gettext-envsubst \
     && chmod +x build.sh && ./build.sh \
     && install -m 755 docker-entrypoint.sh /docker-entrypoint.sh \
     && install -m 755 healthcheck.sh /usr/local/bin/healthcheck.sh \
