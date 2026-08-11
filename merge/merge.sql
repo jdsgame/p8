@@ -17,9 +17,7 @@ SET @db_name = 'gamedb2';  -- 将数据库B的名称赋值给变量
 
 SET SESSION group_concat_max_len = 10240000;
 
--- 设定数据库B中重名角色以及重名公会前缀
-set @pname='S';           -- 角色重名前缀
-set @uname='S';           -- 公会重名前缀
+-- 重名角色/公会改名格式：CONCAT(`name`, '#', zone_id)，无需前缀变量
 
 set @ret1=NULL;
 set @ret2=NULL;
@@ -196,13 +194,13 @@ GET DIAGNOSTICS @ret6 = ROW_COUNT;
 DEALLOCATE PREPARE stmt;
 
 -- 修改数据库B中重名角色的名字
-SET @sql = CONCAT('update ', @db_name, '.t_player set `name`=CONCAT(@pname,zone_id,\'.\',`name`), grocery = json_remove(grocery, \'$.rename_times\') where id in (select a_id from temp3)');
+SET @sql = CONCAT('update ', @db_name, '.t_player set `name`=CONCAT(`name`,\'#\',zone_id), grocery = json_remove(grocery, \'$.rename_times\') where id in (select a_id from temp3)');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 GET DIAGNOSTICS @ret7 = ROW_COUNT;
 DEALLOCATE PREPARE stmt;
 
-SET @sql = CONCAT('update ', @db_name, '.t_name set `name`=CONCAT(@pname,zone_id,\'.\',`name`) where id in (select a_id from temp3)');
+SET @sql = CONCAT('update ', @db_name, '.t_name set `name`=CONCAT(`name`,\'#\',zone_id) where id in (select a_id from temp3)');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 GET DIAGNOSTICS @ret8 = ROW_COUNT;
@@ -213,20 +211,20 @@ SET @sql = CONCAT('update ', @db_name, '.t_guild set rename_times = 1 where rena
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
-SET @sql = CONCAT('update ', @db_name, '.t_guild set `name`=CONCAT(@uname,zone_id,\'.\',`name`), rename_times=0 where id in (select a_id from temp4)');
+SET @sql = CONCAT('update ', @db_name, '.t_guild set `name`=CONCAT(`name`,\'#\',zone_id), rename_times=0 where id in (select a_id from temp4)');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 GET DIAGNOSTICS @ret9 = ROW_COUNT;
 DEALLOCATE PREPARE stmt;
 
 -- 修改数据库A中重名角色的名字
-update t_player set `name`=CONCAT(@pname,zone_id,'.',`name`), grocery = json_remove(grocery, '$.rename_times') where id in (select b_id from temp3);
+update t_player set `name`=CONCAT(`name`,'#',zone_id), grocery = json_remove(grocery, '$.rename_times') where id in (select b_id from temp3);
 set @ret10=ROW_COUNT();
-update t_name set `name`=CONCAT(@pname,zone_id,'.',`name`) where id in (select b_id from temp3);
+update t_name set `name`=CONCAT(`name`,'#',zone_id) where id in (select b_id from temp3);
 set @ret11=ROW_COUNT();
 -- 修改数据库A中重名军团的名字
 update t_guild set rename_times = 1 where rename_times = 0;
-update t_guild set `name`=CONCAT(@uname,zone_id,'.',`name`), rename_times=0 where id in (select b_id from temp4);
+update t_guild set `name`=CONCAT(`name`,'#',zone_id), rename_times=0 where id in (select b_id from temp4);
 set @ret12=ROW_COUNT();
 
 -- 数据合并
