@@ -1,0 +1,79 @@
+- hosts: "{{ service_group }}"
+  serial: "{{ batch_size | default('100%') }}"
+  tasks:
+    - name: 查找 {{ service_group }} unit
+      shell: "systemctl list-unit-files '{{ unit_pattern }}' --no-legend --no-pager | awk '{print $1}'"
+      register: unit_list
+      changed_when: false
+      tags:
+        - stop
+        - start
+        - clean
+
+    - name: 启动 {{ service_group }} unit
+      systemd:
+        name: "{{ item }}"
+        state: started
+      loop: "{{ unit_list.stdout_lines }}"
+      tags:
+        - start
+
+    - name: 停止 {{ service_group }} unit
+      systemd:
+        name: "{{ item }}"
+        state: stopped
+        no_block: true
+      loop: "{{ unit_list.stdout_lines }}"
+      tags:
+        - stop
+
+    - name: 获取并校验 {{ service_group }} unit 工作目录
+      command:
+        argv:
+          - systemctl
+          - show
+          - --property=WorkingDirectory
+          - --value
+          - "{{ item }}"
+      loop: "{{ unit_list.stdout_lines }}"
+      register: working_directories
+      changed_when: false
+      failed_when: not (working_directories.stdout | trim).startswith('/data/')
+      tags:
+        - clean
+
+    - name: 删除 {{ service_group }} 日志
+      file:
+        path: "{{ item.stdout | trim }}/log"
+        state: absent
+      loop: "{{ working_directories.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      tags:
+        - clean
+
+    - name: 等待 {{ service_group }} unit 停止完成
+      command:
+        argv:
+          - systemctl
+          - show
+          - --property=ActiveState
+          - --value
+          - "{{ item }}"
+      loop: "{{ unit_list.stdout_lines }}"
+      register: unit_state
+      changed_when: false
+      retries: 15
+      delay: 2
+      until: (unit_state.stdout | trim) == 'inactive'
+      tags:
+        - stop
+
+    - name: 轮转并清空 systemd journal
+      command:
+        argv:
+          - journalctl
+          - --rotate
+          - --vacuum-time=1s
+      tags:
+        - journal
