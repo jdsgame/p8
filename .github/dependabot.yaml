@@ -3,39 +3,40 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
-    schedule:
-      interval: "daily"
-      time: "00:00"
-      timezone: "Asia/Shanghai"
+    schedule: { interval: "cron", cronjob: "0 0 * * *", timezone: "Asia/Shanghai" }
     open-pull-requests-limit: 10
     target-branch: "dev"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-    groups:
-      actions:
-        patterns:
-          - "*"
+    commit-message: { prefix: "chore", include: "scope" }
+    groups: { actions: { patterns: ["*"] } }
 
   - package-ecosystem: "docker"
-    directories:
-      - "/bi/base"
-      - "/bserver"
-      - "/ipinfo"
-    schedule:
-      interval: "daily"
-      time: "00:00"
-      timezone: "Asia/Shanghai"
+    directory: "/bserver"
+    schedule: { interval: "cron", cronjob: "0 0 * * *", timezone: "Asia/Shanghai" }
     open-pull-requests-limit: 10
     target-branch: "dev"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
+    commit-message: { prefix: "chore", include: "scope" }
+    groups: { docker: { patterns: ["*"] } }
+
+  # python
+  - package-ecosystem: "docker"
+    directory: "/bi/base"
+    schedule: { interval: "cron", cronjob: "0 0 * * *", timezone: "Asia/Shanghai" }
+    open-pull-requests-limit: 10
+    target-branch: "dev"
+    commit-message: { prefix: "chore", include: "scope" }
     ignore:
-      - dependency-name: "python"
-        versions:
-          - ">= 3.10"
-    groups:
-      docker:
-        patterns:
-          - "*"
+      - dependency-name: python
+        versions: [">= 3.10.0"]
+    groups: { docker: { patterns: ["*"] } }
+
+  # php
+  - package-ecosystem: "docker"
+    directory: "/php"
+    schedule: { interval: "cron", cronjob: "0 0 * * *", timezone: "Asia/Shanghai" }
+    open-pull-requests-limit: 10
+    target-branch: "dev"
+    commit-message: { prefix: "chore", include: "scope" }
+    ignore:
+      - dependency-name: php
+        versions: [">= 8.6.0"]
+    groups: { docker: { patterns: ["*"] } }
