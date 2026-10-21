@@ -15,6 +15,7 @@ permissions:
   contents: read
 
 env:
+  BUILDX_NO_DEFAULT_OCI_ARTIFACT: "1"
   TZ: Asia/Shanghai
   WORK_DIR: php
   ALIYUN_REGISTRY: registry.cn-chengdu.aliyuncs.com
