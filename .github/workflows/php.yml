@@ -1,0 +1,128 @@
+---
+name: Build
+
+on:
+  push:
+    branches: [master, dev]
+    paths: [php/.php-version]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TZ: Asia/Shanghai
+  WORK_DIR: php
+  ALIYUN_REGISTRY: registry.cn-chengdu.aliyuncs.com
+  ALIYUN_REGISTRY_NAMESPACE: ${{ github.repository_owner }}
+  ALIYUN_REGISTRY_IMAGE: php-base
+
+jobs:
+  build:
+    name: Build
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-26.04, platform: linux/amd64 }
+          - { os: ubuntu-26.04-arm, platform: linux/arm64 }
+    runs-on: ${{ matrix.os }}
+    outputs:
+      php_tag: ${{ steps.prepare.outputs.php_tag }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Prepare
+        id: prepare
+        run: |
+          echo "platform_pair=$(awk -F/ '{print $1"-"$2$3}' <<< '${{ matrix.platform }}')" >> "$GITHUB_OUTPUT"
+          echo "php_tag=$(<php/.php-version)-alpine" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Aliyun
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.ALIYUN_REGISTRY }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.ALIYUN_REGISTRY }}/${{ env.ALIYUN_REGISTRY_NAMESPACE }}/${{ env.ALIYUN_REGISTRY_IMAGE }}
+          tags: |
+            type=raw,value=${{ steps.prepare.outputs.php_tag }}
+
+      - name: Build and export
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ env.WORK_DIR }}
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: >
+            type=image,name=${{ env.ALIYUN_REGISTRY }}/${{ env.ALIYUN_REGISTRY_NAMESPACE }}/${{ env.ALIYUN_REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: digest-${{ steps.prepare.outputs.platform_pair }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 4
+
+  merge:
+    name: Merge manifest
+    runs-on: ubuntu-26.04
+    needs: build
+
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v8
+        with:
+          path: /tmp/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Aliyun
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.ALIYUN_REGISTRY }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.ALIYUN_REGISTRY }}/${{ env.ALIYUN_REGISTRY_NAMESPACE }}/${{ env.ALIYUN_REGISTRY_IMAGE }}
+          tags: |
+            type=raw,value=${{ needs.build.outputs.php_tag }}
+
+      - name: Create manifest and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.ALIYUN_REGISTRY }}/${{ env.ALIYUN_REGISTRY_NAMESPACE }}/${{ env.ALIYUN_REGISTRY_IMAGE }}@sha256:%s ' *)
+
+      - name: Inspect image
+        run: docker buildx imagetools inspect ${{ env.ALIYUN_REGISTRY }}/${{ env.ALIYUN_REGISTRY_NAMESPACE }}/${{ env.ALIYUN_REGISTRY_IMAGE }}:${{ needs.build.outputs.php_tag }}

@@ -18,7 +18,7 @@ indent_style = space
 indent_size = 4
 space_redirects = true
 
-[*.{json,lua,yaml}]
+[*.{json,lua,yml,yaml}]
 indent_style = space
 indent_size = 2
 
