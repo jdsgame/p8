@@ -7,7 +7,7 @@
 # References:
 # https://blog.csdn.net/flysnownet/article/details/109387705
 
-FROM php:8.6.0RC3-fpm-alpine@sha256:481010776c273096841ff202f56e6c98ffbdf7ca41483d389b6a3dfa5b236ebe
+FROM php:8.5.12-fpm-alpine
 LABEL maintainer="honeok <i@honeok.com>"
 RUN set -ex \
     && apk update \
