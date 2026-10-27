@@ -28,15 +28,3 @@ updates:
       - dependency-name: python
         versions: [">= 3.10.0"]
     groups: { docker: { patterns: ["*"] } }
-
-  # php
-  - package-ecosystem: "docker"
-    directory: "/php"
-    schedule: { interval: "cron", cronjob: "0 0 * * *", timezone: "Asia/Shanghai" }
-    open-pull-requests-limit: 10
-    target-branch: "dev"
-    commit-message: { prefix: "chore", include: "scope" }
-    ignore:
-      - dependency-name: php
-        versions: [">= 8.6.0"]
-    groups: { docker: { patterns: ["*"] } }
