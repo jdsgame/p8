@@ -19,7 +19,7 @@ env:
   TZ: Asia/Shanghai
   WORK_DIR: php
   ALIYUN_REGISTRY: registry.cn-chengdu.aliyuncs.com
-  ALIYUN_REGISTRY_NAMESPACE: ${{ github.repository_owner }}
+  ALIYUN_REGISTRY_NAMESPACE: gamejds
   ALIYUN_REGISTRY_IMAGE: php-base
 
 jobs:
