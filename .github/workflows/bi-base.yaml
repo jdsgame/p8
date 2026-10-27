@@ -20,6 +20,7 @@ concurrency:
 env:
   TZ: Asia/Shanghai
   WORK_DIR: bi/base
+  BUILDX_NO_DEFAULT_OCI_ARTIFACT: "1"
   ALIYUN_REGISTRY: registry.cn-chengdu.aliyuncs.com
   # ALIYUN_REGISTRY_NAMESPACE: ${{ github.repository_owner }}
   ALIYUN_REGISTRY_NAMESPACE: gamejds
