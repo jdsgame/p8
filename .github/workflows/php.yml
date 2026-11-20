@@ -42,7 +42,9 @@ jobs:
         id: prepare
         run: |
           echo "platform_pair=$(awk -F/ '{print $1"-"$2$3}' <<< '${{ matrix.platform }}')" >> "$GITHUB_OUTPUT"
-          echo "php_tag=$(<php/.php-version)-alpine" >> "$GITHUB_OUTPUT"
+          php_version=$(<php/.php-version)
+          echo "php_version=$php_version" >> "$GITHUB_OUTPUT"
+          echo "php_tag=${php_version}-alpine" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -68,6 +70,7 @@ jobs:
         with:
           context: ${{ env.WORK_DIR }}
           platforms: ${{ matrix.platform }}
+          build-args: PHP_VERSION=${{ steps.prepare.outputs.php_version }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: >
             type=image,name=${{ env.ALIYUN_REGISTRY }}/${{ env.ALIYUN_REGISTRY_NAMESPACE }}/${{ env.ALIYUN_REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true

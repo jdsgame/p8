@@ -7,7 +7,8 @@
 # References:
 # https://blog.csdn.net/flysnownet/article/details/109387705
 
-FROM php:8.5.12-fpm-alpine
+ARG PHP_VERSION=8.5.13
+FROM php:${PHP_VERSION}-fpm-alpine
 LABEL maintainer="honeok <i@honeok.com>"
 RUN set -ex \
     && apk update \
